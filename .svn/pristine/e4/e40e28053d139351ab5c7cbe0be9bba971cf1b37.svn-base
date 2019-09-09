@@ -1,0 +1,57 @@
+import { Component, OnInit, Input, Inject } from '@angular/core';
+import { QuestionService } from 'src/app/services/question.service';
+import { MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { AddQuestionComponent } from './add-question/add-question.component';
+import { Router } from '@angular/router';
+import { EditQuestionComponent } from './edit-question/edit-question.component';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'app-questions',
+  templateUrl: './questions.component.html',
+  styleUrls: ['./questions.component.css']
+})
+export class QuestionsComponent implements OnInit {
+
+  // @Input() data;
+  surveyId: string;
+  questions: any;
+  displayedColumns: string[] = ['Questions List', 'Icons'];
+  constructor(private questionService: QuestionService, private dialog: MatDialog, private router: Router,
+              @Inject(MAT_DIALOG_DATA) data: any) { this.surveyId = data; }
+
+  ngOnInit() {
+    this.getData();
+  }
+  addQuestions() {
+    this.dialog.open(AddQuestionComponent, {
+      data: this.surveyId,
+      width: '440px', height: '200px' });
+  }
+  getData() {
+    this.questionService.getQuestionsData(this.surveyId)
+      .subscribe(
+        (data) => {
+          this.questions = data;
+          console.log(this.questions);
+        }, err => err);
+  }
+  onEdit(id) {
+    this.dialog.open(EditQuestionComponent,
+      {
+        data: {
+          id,
+          surveyId: this.surveyId
+        }, width: '440px', height: '170px',
+      });
+  }
+  onDelete(id) {
+    this.questionService.deleteQue(this.surveyId, id)
+      .subscribe(
+        (data) => {
+          console.log(data);
+          window.alert('User deleted Successfully...');
+          this.router.navigate(['../navbar/question']);
+        }, err => err);
+  }
+}

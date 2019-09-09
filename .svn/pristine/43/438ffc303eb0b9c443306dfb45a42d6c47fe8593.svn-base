@@ -1,0 +1,49 @@
+import { Component, OnInit, Inject } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { QuestionService } from '../../../services/question.service';
+import { Router } from '@angular/router';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA } from '@angular/material';
+import { from } from 'rxjs';
+
+@Component({
+  selector: 'app-edit-question',
+  templateUrl: './edit-question.component.html',
+  styleUrls: ['./edit-question.component.css']
+})
+export class EditQuestionComponent implements OnInit {
+
+  editQuestionForm: FormGroup;
+  id: any;
+  surveyId: string;
+
+  constructor(private fb: FormBuilder, private questionService: QuestionService,
+              private router: Router, private dialogRef: MatDialogRef<EditQuestionComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
+              this.surveyId = data.surveyId;
+              this.id = data.id;
+              this.editQuestion();
+  }
+
+  ngOnInit() {
+
+  }
+
+  editQuestion() {
+    this.editQuestionForm = this.fb.group({
+      questionText: ['', Validators.required],
+    });
+  }
+
+  onSubmit() {
+    console.log(this.surveyId);
+    this.questionService.updateQue(this.surveyId, this.id, this.editQuestionForm.value)
+      .subscribe(
+        (data) => {
+          window.alert(' Data Updated Successfully...');
+        }, (err) => console.log(err)
+      );
+    window.location.reload();
+    this.dialogRef.close();
+  }
+}

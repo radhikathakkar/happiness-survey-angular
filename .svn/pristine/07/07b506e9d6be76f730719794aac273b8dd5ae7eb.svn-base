@@ -1,0 +1,34 @@
+<div>
+  <mat-toolbar> Questions List!!</mat-toolbar>
+
+  <!-- qustion list Column -->
+  <table mat-table [dataSource]="questions">
+    <ng-container matColumnDef="Questions List">
+      <th mat-header-cell *matHeaderCellDef>Questions List</th>
+      <td mat-cell *matCellDef="let element ">{{element.questionText}}</td>
+    </ng-container>
+
+    <!-- Edit Column -->
+    <ng-container matColumnDef="Icons">
+      <th mat-header-cell *matHeaderCellDef> Icons </th>
+      <td mat-cell *matCellDef="let element">
+        <!--   <button mat-button type="submit" (click)="onEdit()"><mat-icon aria-hidden="false" aria-label="Example home icon">{{icons.icon}}</mat-icon></button> -->
+        <button mat-icon-button color="primary" (click)="onEdit(element._id)"><i
+            class="material-icons">edit</i></button>
+        <button mat-icon-button color="primary" (click)="onDelete(element._id)"><i
+            class="material-icons">delete</i></button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
+
+<a mat-flat-button (click)="addQuestions()" class="add-que-data"><span class="fa fa-sign-in fa-lg"></span><i
+    class="material-icons">
+    add_circle_outline</i></a>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Close</button>
+
+</mat-dialog-actions>

@@ -1,0 +1,100 @@
+import { Component, OnInit } from '@angular/core';
+
+import { Observable } from 'rxjs';
+import { NgForm } from '@angular/forms';
+import { SurveyService } from 'src/app/services/survey.service';
+import { LoginService } from 'src/app/services/login.service';
+import { Action } from 'rxjs/internal/scheduler/Action';
+import { ActivatedRoute } from '@angular/router';
+
+@Component({
+  selector: 'app-survey',
+  templateUrl: './survey.component.html',
+  styleUrls: ['./survey.component.css']
+})
+export class SurveyComponent implements OnInit {
+  point = '2';
+
+  selectValue: string;
+  selectedPerson: any;
+  points: any = [];
+  survey = [];
+  question: any;
+  userId: string;
+  surveyId: string;
+  newArray: any;
+  newObj = [];
+  titleName: string;
+  person: any;
+  generatedObj = [];
+  message: string;
+  constructor(private surveyService: SurveyService, private loginService: LoginService, private route: ActivatedRoute) { }
+
+  ngOnInit() {
+    this.userId = localStorage.getItem('uid');
+
+    this.surveyService.getUsersFilledSurvey(this.userId)
+      .subscribe((result) => {
+        this.survey = result;
+        console.log('survey', this.survey);
+
+        if (this.survey.length === 0) {
+          this.message = 'Any Survey not assign to you';
+          console.log(this.message);
+        } else {
+          this.surveyId = this.survey[0]._id;
+          this.titleName = this.survey[0].title;
+          this.question = this.survey[0].questions;
+          console.log(this.question);
+        }
+
+      });
+    this.loginService.showList();
+  }
+
+  onSubmit = () => {
+    console.log(this.points.length);
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < this.question.length; i++) {
+      this.newArray = {
+        questionID: this.question[i]._id,
+        response: this.points[i]
+      };
+      this.newObj.push(this.newArray);
+    }
+    console.log(this.newObj);
+    this.newObj.forEach(e => {
+      if (e.response === undefined) {
+
+        this.generatedObj.push({ response: 0 });
+
+      } else {
+        this.generatedObj.push(e);
+      }
+      console.log(this.generatedObj);
+    });
+    this.surveyService.postSurveyResponse(this.surveyId, this.userId, this.generatedObj)
+      .subscribe((result) => {
+        // console.log(result);
+      });
+    // location.reload();
+    this.generatedObj = [];
+    this.newObj = [];
+  }
+  onSelect = (e, selectValue) => {
+    // tslint:disable-next-line:no-string-literal
+    const selectedSurvey = this.survey.find(item => item['_id'] === e);
+
+    if (this.survey.length === 0) {
+      this.message = 'Any Survey not assign to you';
+    } else {
+      this.surveyId = selectedSurvey._id;
+      this.titleName = selectedSurvey.title;
+      this.question = selectedSurvey.questions;
+      console.log(this.surveyId);
+      console.log(selectedSurvey);
+    }
+
+
+  }
+}

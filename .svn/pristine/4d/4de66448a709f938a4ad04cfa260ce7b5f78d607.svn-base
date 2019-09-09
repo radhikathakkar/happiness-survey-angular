@@ -1,0 +1,16 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class HierarchyService {
+  baseUrl = 'http://localhost:3000/surveys';
+  constructor(private http: HttpClient, private router: Router) { }
+
+  getSqlData() {
+    return this.http.post(this.baseUrl + '/sql', { id: 'sandeep.prajapati@rishabhsoft.com' })
+      .pipe(res => res);
+  }
+}

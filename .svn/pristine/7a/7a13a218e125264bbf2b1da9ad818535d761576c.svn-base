@@ -1,0 +1,15 @@
+import { TestBed, async, inject } from '@angular/core/testing';
+
+import { AuthRaGuard } from './auth-ra.guard';
+
+describe('AuthRaGuard', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [AuthRaGuard]
+    });
+  });
+
+  it('should ...', inject([AuthRaGuard], (guard: AuthRaGuard) => {
+    expect(guard).toBeTruthy();
+  }));
+});

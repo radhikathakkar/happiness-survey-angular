@@ -1,0 +1,20 @@
+<form novalidate [formGroup]="editQuestionForm" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <p>
+      <mat-form-field class="full-control">
+        <input matInput type="text" placeholder="Edit Question" formControlName="questionText" name="questionText"
+          required>
+        <mat-error
+          *ngIf="editQuestionForm.get('questionText').hasError('required') && editQuestionForm.get('questionText').touched">
+          Please Enter the Question!!</mat-error>
+      </mat-form-field>
+    </p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close>Close</button>
+
+    <button mat-button color="primary" type="submit">Edit Question</button>
+
+  </mat-dialog-actions>
+</form>

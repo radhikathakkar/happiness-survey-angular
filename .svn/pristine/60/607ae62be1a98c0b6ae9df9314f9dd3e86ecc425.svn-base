@@ -1,0 +1,79 @@
+import { Component, OnInit, Inject } from '@angular/core';
+import { MatTableDataSource, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { UserService } from 'src/app/services/user.service';
+import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
+import { SurveyService } from 'src/app/services/survey.service';
+import { Route, Router } from '@angular/router';
+
+@Component({
+  selector: 'app-assignees-data',
+  templateUrl: './assignees-data.component.html',
+  styleUrls: ['./assignees-data.component.css']
+})
+export class AssigneesDataComponent implements OnInit {
+
+  displayedColumns: string[] = ['EmpName', 'RishabhId', 'Designation', 'DivName', 'icon'];
+  dataSource: any = new MatTableDataSource();
+  surveyId: string;
+  myForm: FormGroup;
+  name: string;
+  userArray: any = [];
+  allUser: any = [];
+  constructor(private dialogRef: MatDialogRef<AssigneesDataComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
+              private userService: UserService, private surveyService: SurveyService, private fb: FormBuilder, private router: Router) {
+                this.surveyId = data.surveyId;
+                this.userArray = [];
+                this.userArray = data.user;
+                this.createArray();
+               }
+
+  ngOnInit() {
+    this.name = localStorage.getItem('name');
+    this.getData();
+  }
+
+  createArray = () => {
+    this.myForm = this.fb.group({
+      rishabhId: this.fb.array([])
+    });
+  }
+
+  public getData = () => {
+    this.userService.getUserData(this.name)
+      .subscribe((data: any) => {
+        let value;
+        this.allUser = [];
+        data.recordset.forEach(user => {
+            value = this.userArray.includes(user.RishabhId);
+            if (value === true) {
+              this.allUser.push(user);
+            }
+          });
+        this.dataSource = this.allUser;
+        }, (err) => console.log(err));
+  }
+
+
+   // To get selected user
+  onChange = (value, isChecked) => {
+    const emailFormArray = this.myForm.controls.rishabhId as FormArray;
+    if (isChecked) {
+      emailFormArray.push(new FormControl(value.RishabhId));
+      localStorage.setItem('RishabhId', value.RishabhId);
+
+    } else {
+      const index = emailFormArray.controls.findIndex(x => x.value === value.RishabhId);
+      emailFormArray.removeAt(index);
+      localStorage.removeItem('RishabhId');
+    }
+    console.log(this.myForm.value.rishabhId);
+  }
+
+  addAssignees = () => {
+    this.surveyService.postAssigneesToSurvey(this.surveyId, this.myForm.value.rishabhId)
+    .subscribe((data) => {
+      console.log(data);
+    });
+    window.location.reload();
+  }
+}

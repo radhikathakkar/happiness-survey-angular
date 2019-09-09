@@ -1,0 +1,70 @@
+
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { SurveyService } from '../services/survey.service';
+import { LoginService } from '../services/login.service';
+import { UserService } from '../services/user.service';
+import { async } from '@angular/core/testing';
+import { isBoolean } from 'util';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent implements OnInit {
+  userForms: any = {};
+  option = '';
+  id: any;
+  show: boolean;
+  email: string;
+  firstname: string;
+  lastname: string;
+  name: string;
+  value: any;
+  constructor(private router: Router, private loginService: LoginService, private userService: UserService) { }
+
+  ngOnInit() {
+  }
+  public trimUser = () => {
+    this.email = localStorage.getItem('user');
+    this.name = this.email.substring(0, this.email.lastIndexOf('@'));
+    this.firstname = this.name.split('.')[0];
+    this.lastname = this.name.split('.')[1];
+    localStorage.setItem('name', this.name);
+    localStorage.setItem('firstname', this.firstname);
+    localStorage.setItem('lastname', this.lastname);
+  }
+
+  onSubmit() {
+    this.loginService.authLogin(this.userForms)
+      .subscribe(
+        data => {
+          localStorage.setItem('user', this.userForms.username);
+          this.trimUser();
+          this.value = data;
+          localStorage.setItem('boolean', this.value.boolean);
+
+          if (this.value.boolean === true) {
+            this.router.navigate(['/navbar/profile']);
+          } else {
+            this.router.navigate(['/navbar/survey']);
+          }
+        },
+        err => console.log(err)
+      );
+
+    const username = this.userForms.username.split('.com')[0];
+    console.log(username);
+    this.loginService.CheckUser(username)
+      .subscribe(
+        data => {
+          this.id = data[0]._id;
+          localStorage.setItem('uid', this.id);
+        });
+  }
+
+  isPassword() {
+    this.show = !this.show;
+  }
+}

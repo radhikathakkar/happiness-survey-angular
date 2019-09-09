@@ -1,0 +1,44 @@
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { NavbarComponent } from './navbar/navbar.component';
+import { LoginComponent } from './login/login.component';
+import { QuestionsComponent } from './survey-data/questions/questions.component';
+import { AddQuestionComponent } from './survey-data/questions/add-question/add-question.component';
+import { UserComponent } from './user/user.component';
+import { EditQuestionComponent } from './survey-data/questions/edit-question/edit-question.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { from } from 'rxjs';
+import { AuthGuard } from './_guards/auth.guard';
+import { SurveyComponent } from './dashboard/survey/survey.component';
+import { HeroesComponent } from './heroes/heroes.component';
+import { SurveyDataComponent } from './survey-data/survey-data.component';
+import { AddSurveyComponent } from './add-survey/add-survey.component';
+import { AuthRaGuard } from './_guards/auth-ra.guard';
+import { AssigneesComponent } from './add-survey/assignees/assignees.component';
+
+const routes: Routes = [
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  {
+    path: 'navbar', component: NavbarComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: 'profile', component: HeroesComponent },
+      { path: 'question', component: QuestionsComponent, canActivate: [AuthRaGuard]  },
+      { path: 'add-question', component: AddQuestionComponent },
+      { path: 'user', component: UserComponent, canActivate: [AuthRaGuard]  },
+      { path: 'edit-question', component: EditQuestionComponent },
+      { path: 'dashboard', component: DashboardComponent, canActivate: [AuthRaGuard]  },
+      { path: 'survey', component: SurveyComponent },
+      { path: 'survey-data', component: SurveyDataComponent, canActivate: [AuthRaGuard]  },
+      { path: 'add-survey', component: AddSurveyComponent, canActivate: [AuthRaGuard]  },
+      { path: 'assignees', component: AssigneesComponent, canActivate: [AuthRaGuard]  }
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

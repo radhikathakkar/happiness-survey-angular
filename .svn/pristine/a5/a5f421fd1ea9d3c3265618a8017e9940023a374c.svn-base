@@ -1,0 +1,154 @@
+import { Component, OnInit } from '@angular/core';
+import { Chart } from 'chart.js';
+import { Observable } from 'rxjs';
+import { HierarchyService } from '../services/hierarchy.service';
+import { UserService } from '../services/user.service';
+import { SurveyService } from '../services/survey.service';
+
+/* tslint:disable */
+@Component({
+	selector: 'app-dashboard',
+	templateUrl: './dashboard.component.html',
+	styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent implements OnInit {
+	constructor(private hierarchy: HierarchyService, private userService: UserService, private surveyService: SurveyService) { }
+	name: string;
+	EmpName: String;
+	surveyId: string;
+	// tslint:disable-next-line:ban-types
+	nullArray: any = [];
+	myArray: any = [];
+	newArray: any = [];
+	survey = [];
+	question: any = [];
+	recordset: any;
+	myChart: any = 0;
+	ctx: any = 0;
+	ngOnInit() {
+		this.getName();
+		this.getData();
+		this.getUnderSurvey();
+	}
+
+	getUnderSurvey = () => {
+		this.surveyId = localStorage.getItem('sid');
+		// tslint:disable-next-line:ban-types
+		const userName = localStorage.getItem('name');
+
+		this.surveyService.getUnderSurvey(userName)
+			.subscribe((result) => {
+				this.survey = result;
+				console.log(this.survey)
+				const multiArray = this.survey[0].assignees.map(x => x.response.map(y => y.response));
+				this.gotArray(multiArray);
+				const HappinessLevel = this.newArray.reduce(this.r, 0);
+				console.log(HappinessLevel / this.newArray.length);
+				this.showChart()
+				this.newArray = [];
+			});
+	}
+
+	getName = () => {
+		this.name = localStorage.getItem('name');
+	}
+
+	public getData = () => {
+		this.userService.getUserData(this.name)
+			.subscribe((data) => {
+				this.recordset = data.recordset;
+				this.EmpName = this.recordset.map(x => x.EmpName);
+			}, (err) => console.log(err));
+	}
+	onchange = (e) => {
+		this.newArray = [];
+		const selectedSurvey = this.survey.find(item => item['_id'] === e);
+		this.myArray = [];
+		const multiArray = selectedSurvey.assignees.map(x => x.response.map(y => y.response));
+		console.log(multiArray)
+		this.gotArray(multiArray);
+		this.showChart()
+	}
+	r = (e, f) => {
+		return e + f;
+	}
+	showChart = () => {
+		this.ctx = document.getElementById('myChart');
+		this.myChart = new Chart(this.ctx, {
+			type: 'bar',
+			data: {
+				labels: this.question,
+				datasets: [{
+					label: '# of Votes',
+					data: this.newArray,
+					backgroundColor: [
+						'rgba(255, 99, 132, 0.2)',
+						'rgba(54, 162, 235, 0.2)',
+						'rgba(255, 206, 86, 0.2)',
+						'rgba(75, 192, 192, 0.2)',
+						'rgba(153, 102, 255, 0.2)',
+						'rgba(255, 159, 64, 0.2)'
+					],
+					borderColor: [
+						'rgba(255, 99, 132, 1)',
+						'rgba(54, 162, 235, 1)',
+						'rgba(255, 206, 86, 1)',
+						'rgba(75, 192, 192, 1)',
+						'rgba(153, 102, 255, 1)',
+						'rgba(255, 159, 64, 1)'
+					],
+					borderWidth: 1
+				}]
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							min: 0,
+							max: 10,
+							beginAtZero: true
+						}
+					}]
+				}
+			}
+		});
+		this.newArray = [];
+	}
+	gotArray = (multiArray) => {
+		this.question = [];
+		this.nullArray = [];
+		multiArray.forEach(e => {
+			if (e.length === 0) {
+				console.log('null');
+			} else {
+
+				this.nullArray.push(e);
+			}
+		});
+		if(this.nullArray.length === 0){
+			console.log('Survey has no fill data yet')
+		} else {
+
+		console.log('checked', this.nullArray);
+		for (var i = 0; i < this.nullArray[0].length; i++) {
+			var num = 0;
+			var length = this.nullArray.length;
+			this.question.push('Question ' + (i + 1))
+
+			// still assuming all arrays have the same amount of numbers
+			// tslint:disable-next-line:prefer-for-of
+			for (let i2 = 0; i2 < this.nullArray.length; i2++) {
+				var temp = this.nullArray[i2];
+				num += this.nullArray[i2][i];
+			}
+			console.log('num ', length)
+			this.myArray.push(Math.round(num / length));
+		}
+		console.log(this.question)
+		this.newArray = [];
+		this.newArray.splice(0, this.newArray.length, ...this.myArray);
+		console.log(this.newArray);
+		return this.newArray;
+	}
+	}
+}

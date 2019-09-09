@@ -1,0 +1,70 @@
+import { Component, OnInit, Inject, Input, Output, EventEmitter } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { SurveyService } from 'src/app/services/survey.service';
+import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
+import { UserService } from 'src/app/services/user.service';
+
+@Component({
+  selector: 'app-assignees',
+  templateUrl: './assignees.component.html',
+  styleUrls: ['./assignees.component.css']
+})
+export class AssigneesComponent implements OnInit {
+
+  onAdd = new EventEmitter();
+  displayedColumns: string[] = ['EmpName', 'RishabhId', 'DivName', 'icon'];
+  dataSource = new MatTableDataSource();
+  myForm: FormGroup;
+  name: string;
+  userArray: any = [];
+  userList: string;
+  assigneesList: any = [];
+  constructor(private dialogRef: MatDialogRef<AssigneesComponent>, private fb: FormBuilder, private userService: UserService,
+              private surveyService: SurveyService) {
+    this.createArray();
+  }
+
+  ngOnInit() {
+    this.name = localStorage.getItem('name');
+    this.getData();
+  }
+
+  createArray = () => {
+    this.myForm = this.fb.group({
+      rishabhId: this.fb.array([])
+    });
+  }
+
+  // To get Users belongs to specifies RA
+  public getData = () => {
+    this.userService.getUserData(this.name)
+      .subscribe((data: any) => {
+        this.dataSource = data.recordset;
+      }, (err) => console.log(err));
+  }
+
+  // To get selected user
+  onChange = (value, isChecked) => {
+    const emailFormArray = this.myForm.controls.rishabhId as FormArray;
+    if (isChecked) {
+      emailFormArray.push(new FormControl(value.RishabhId));
+      localStorage.setItem('RishabhId', value.RishabhId);
+    } else {
+      const index = emailFormArray.controls.findIndex(x => x.value === value.RishabhId);
+      emailFormArray.removeAt(index);
+      localStorage.removeItem('RishabhId');
+    }
+  }
+
+  postUserToSurvey = () => {
+    this.userArray = this.myForm.value.rishabhId;
+    this.surveyService.postUserByRishabhId(this.userArray)
+    .subscribe((data) => {
+      this.userList = data.map(user => user._id);
+      this.assigneesList.push(this.userList);
+    });
+    this.dialogRef.close();
+    this.onAdd.emit(this.assigneesList);
+  }
+}

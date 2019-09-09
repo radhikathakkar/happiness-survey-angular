@@ -1,0 +1,31 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Survey } from '../shared/survey';
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionService {
+
+  surveyId: string;
+  url = `http://localhost:3000/survey`;
+
+  constructor(private http: HttpClient) { }
+
+  getQuestionsData(surveyId: string) {
+    return this.http.get(`${this.url}/${surveyId}/questions`)
+      .pipe(res => res);
+  }
+  addQuestionsData(surveyID: string, survey: Survey) {
+    return this.http.post(`${this.url}/${surveyID}/questions`, survey)
+      .pipe(res => res);
+  }
+  deleteQue(surveyID: string, id: any) {
+    return this.http.delete(`${this.url}/${surveyID}/questions/${id}`);
+  }
+
+  updateQue(surveyID: string, id, survey: Survey) {
+    return this.http.put(`${this.url}/${surveyID}/questions/${id}`, survey)
+      .pipe(res => res);
+  }
+
+}

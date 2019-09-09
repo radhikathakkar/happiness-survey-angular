@@ -1,0 +1,28 @@
+import { Injectable } from '@angular/core';
+
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AdminService {
+
+  url = 'http://localhost:3000/admin/admin-login';
+
+  constructor(private http: HttpClient, private router: Router) { }
+
+
+  logoutUser() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
+  }
+
+  getToken() {
+    return localStorage.getItem('token');
+  }
+
+  loggedIn() {
+    return !!localStorage.getItem('token');
+  }
+}

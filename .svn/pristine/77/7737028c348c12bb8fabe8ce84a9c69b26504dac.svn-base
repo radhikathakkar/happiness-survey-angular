@@ -1,0 +1,269 @@
+import { Component, OnInit, ViewChild, ViewChildren, ChangeDetectorRef } from '@angular/core';
+import { SurveyService } from 'src/app/services/survey.service';
+import { MatDialog, MatTableDataSource, MatTable } from '@angular/material';
+import { UserService } from '../services/user.service';
+import { FormGroup, FormBuilder, Validators, NgModel, FormArray, FormControl } from '@angular/forms';
+import { AssigneesDataComponent } from './assignees-data/assignees-data.component';
+import { QuestionsComponent } from './questions/questions.component';
+import { SelectionModel } from '@angular/cdk/collections';
+
+@Component({
+  selector: 'app-survey-data',
+  templateUrl: './survey-data.component.html',
+  styleUrls: ['./survey-data.component.css']
+})
+
+export class SurveyDataComponent implements OnInit {
+  raRishabhId: string;
+  surveys: any;
+  selectedSurvey: any;
+  surveyTitle: string;
+  name: string;
+  findSurvey: any;
+  checkedUserList: any = [];
+  assigneesId: any = [];
+  assingeesList: any = [];
+  questions: any = new MatTableDataSource();
+  assignees: any = new MatTableDataSource();
+  displayedColumns: string[] = ['questionText', 'Icons'];
+  displayedColumnData: string[] = ['Emp Name', 'RishabhId', 'Icons'];
+  surveyUserArr: any = [];
+  allUserArr: any = [];
+  editSurveyForm: FormGroup;
+  userArray: any = [];
+  deleteUserList: any = [];
+  @ViewChild('table', { static: true }) table: MatTable<any>;
+  selection = new SelectionModel<any>(true, []);
+  constructor(private surveyService: SurveyService, private userService: UserService, private fb: FormBuilder,
+              private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) {
+  }
+
+  ngOnInit() {
+    this.name = localStorage.getItem('name');
+    this.raRishabhId = localStorage.getItem('rishabhId');
+    this.getAllUser();
+    this.getSurveyDataByID();
+  }
+  // To get list of Survey Id Details of specific RA
+  getSurveyDataByID = () => {
+    this.surveyService.getSurveyByOwner(this.raRishabhId)
+      .subscribe(
+        (data: any) => {
+          this.surveys = data;
+        });
+  }
+  // get all the user's from sql database
+  getAllUser = () => {
+    this.userService.getUserData(this.name)
+      .subscribe((data) => {
+        this.allUserArr = data.recordset.map(user => user.RishabhId);
+      });
+  }
+  // display result of selected survey by survey id
+  selected(e) {
+    this.editSurveyForm = this.fb.group({
+      title: new FormControl(),
+      questions: this.fb.array([]),
+      assignees: this.fb.array([])
+    });
+    this.findSurvey = this.surveys.find(data => data._id === e);
+    this.surveyTitle = this.findSurvey.title;
+    this.questions = this.findSurvey.questions;
+    this.assingeesList = this.findSurvey.assignees;
+    this.assigneesId = this.assingeesList.map(arr => arr._id);
+    this.getData();
+  }
+  // get assignees dta under selected survey and rishabhId of assignees
+  public getData = () => {
+    this.surveyService.getUsername(this.assigneesId)
+      .subscribe((data) => {
+        this.assignees = data;
+        this.surveyUserArr = this.assignees.map(user => user.RishabhId);
+      });
+  }
+  // delete selected survey
+  deleteSurvey = () => {
+    this.surveyService.deleteSurveyById(this.selectedSurvey)
+      .subscribe(survey => {
+        window.location.reload();
+      });
+  }
+  // open dialog box to add, update and delete questions
+  openDialog(action, obj) {
+    obj.action = action;
+    const dialogRef = this.dialog.open(QuestionsComponent,
+      {
+        data: {
+          que: obj,
+          surveyId: this.selectedSurvey
+        },
+        width: '340px',
+        height: '170px',
+      });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.event === 'Add') {
+        this.addRowData(result.data);
+      } else if (result.event === 'Update') {
+        this.updateRowData(result.data);
+      } else if (result.event === 'Delete') {
+        this.deleteRowData(result.data);
+      }
+    });
+  }
+  // add questions within selected survey
+  addRowData = (rowObj: any) => {
+    console.log('rowObj at add que', rowObj);
+    this.questions.push({
+      questionText: rowObj.questionText,
+      questionType: rowObj.questionType
+    });
+    // this.table.renderRows();
+    // console.log('this.questions', this.questions);
+    // this.changeDetectorRef.detectChanges();
+    this.displayQuestion(this.questions);
+  }
+  // display questions without page reload
+  displayQuestion(obj) {
+    this.questions = obj;
+  }
+  // update questions within selected survey
+  updateRowData = (rowObj: any) => {
+    console.log(rowObj);
+    this.questions = this.questions.filter((value, key) => {
+      if (value._id === rowObj._id) {
+        value.questionText = rowObj.questionText;
+      }
+      return true;
+    });
+  }
+  // delete questions within selected survey
+  deleteRowData = (rowObj: any) => {
+    this.questions = this.questions.filter((value, key) => {
+      console.log('rowObj value =', value);
+      return value.questionText !== rowObj.questionText;
+    });
+    return true;
+  }
+  // delete checked assignees from database
+  deleteAssignees = (action, obj) => {
+    if (action === 'Delete') {
+      if (this.checkedUserList) {
+        this.displayAssigneesAfterDel(this.checkedUserList);
+      }
+    }
+  }
+  // display assignees after delte
+  displayAssigneesAfterDel = (rowObj: any) => {
+    let selectedId;
+    rowObj.filter(ele => selectedId = ele);
+    this.assignees = this.assignees.filter((value, key) => {
+      if (value.RishabhId !== selectedId) {
+        return value.RishabhId !== selectedId;
+      } else {
+        this.deleteUserList = rowObj;
+      //  this.deleteAllAssignees();
+      }
+    });
+  }
+  deleteAllAssignees = () => {
+    this.isAllSelected() ?
+    this.assignees.forEach(row => {
+      this.selection.select(row);
+      this.assignees.splice(row._id, 1);
+    }) :
+    this.assignees = [] ;
+  }
+  getArrayValue = () => {
+    let data;
+    let userVal;
+    this.allUserArr.forEach(users => {
+      userVal = this.userArray.includes(users);
+      data = this.surveyUserArr.includes(users);
+      if (userVal === false) {
+        if (data === true) {
+            this.deleteUserList.forEach((ass) => {
+              this.userArray.push(ass);
+            });
+        } else {
+          this.userArray = [];
+          this.userArray.push(users);
+        }
+      }
+    });
+  }
+  editAssignees = (action, obj) => {
+    obj.action = action;
+    this.getArrayValue();
+    const dialogRef = this.dialog.open(AssigneesDataComponent, {
+      width: '740px', height: '470px',
+      data: {
+        surveyId: this.selectedSurvey,
+        user: this.userArray,
+        object: obj
+      }
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result.event === 'Add') {
+        this.addAssignees(result.data);
+      }
+    });
+  }
+  addAssignees = (rowObj: any) => {
+    this.surveyService.getIdFromRishabhId(rowObj)
+      .subscribe((users) => {
+        users.forEach(user => {
+          this.assignees.push(user);
+        });
+        this.displayAssignees(this.assignees);
+      });
+  }
+  displayAssignees(userObj: any) {
+    this.assignees = userObj;
+  }
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    this.checkedUserList = this.selection.selected.map(user => user.RishabhId);
+    const numRows = this.assignees.length;
+    return numSelected === numRows;
+  }
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle() {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.assignees.forEach(row => {
+        this.selection.select(row);
+      });
+  }
+
+  checkboxLabel(row?: any): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+    }
+
+    return `${this.selection.isSelected(row) ? 'select' : 'deselect'} row ${row.position + 1}`;
+  }
+
+  updateSurveyData() {
+    const title = this.editSurveyForm.controls.title.value;
+    if (title === null) {
+      this.editSurveyForm.controls.title.setValue(this.surveyTitle);
+    }
+    const queFormGroups = this.questions.map(que => this.fb.group(que));
+    const queFormArray = this.fb.array(queFormGroups);
+    const userFormGroups = this.assignees.map(user => this.fb.group(user));
+    const userFormArray = this.fb.array(userFormGroups);
+    this.editSurveyForm.setControl('questions', queFormArray);
+    this.editSurveyForm.setControl('assignees', userFormArray);
+  }
+  onEditSurvey = () => {
+    this.updateSurveyData();
+    console.log(this.editSurveyForm.value);
+    // this.surveyService.updateSurvey(this.selectedSurvey, this.editSurveyForm.value)
+    //   .subscribe((data) => {
+    //     // this.displayAfterEdit(data);
+    //     return data;
+    // });
+  }
+
+}
+

@@ -1,0 +1,19 @@
+<div mat-dialog-content>
+  <mat-form-field *ngIf="action != 'Delete'; else elseTemplate" class="full-control">
+  <div [formGroup]="editQuestionForm" >
+    <div formArrayName="questions" *ngFor="let question of editQuestionForm.get('questions').controls; let i = index;">
+      <div [formGroupName]="i">
+          <input matInput  formControlName="questionText" placeholder="question text" name="questionText">
+        </div>
+      </div>
+    </div>
+  </mat-form-field>
+  <ng-template #elseTemplate>
+    Sure to delete <b>{{localData.questionText}}</b>?
+  </ng-template>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onSubmit()">{{action}}</button>
+  <button mat-button (click)="closeDialog()" mat-flat-button color="warn">Cancel</button>
+</div>

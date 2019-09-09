@@ -1,0 +1,38 @@
+.example-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .example-events {
+    width: 300px;
+    height: 200px;
+    overflow: auto;
+    border: 1px solid #555;
+    }
+    mat-sidenav-container {
+        height: 100%;
+    }
+    mat-sidenav,mat-sidenav-content {
+        background-color: 16px;
+    }
+    mat-sidenav{
+        background-color:lightblue;
+        width: 200px;
+
+    }
+    .example-card {
+      width: 40%;
+      margin: 50px auto;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      text-align: center;
+      }
+
+      .example-header-image {
+        background-size: cover;
+      }
+.profile-title{
+  text-align: center;
+}

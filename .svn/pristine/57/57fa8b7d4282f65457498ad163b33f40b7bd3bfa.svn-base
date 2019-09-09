@@ -1,0 +1,75 @@
+<h4>Select Survey</h4>
+<mat-form-field class="full-width">
+  <mat-label>Select Survey </mat-label>
+  <mat-select matNativeControl [(ngModel)]="selectedSurvey" (ngModelChange)="selected($event)" name="survey">
+    <mat-option *ngFor="let survey of surveys" [value]="survey._id">
+      {{survey.title}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+
+<div fxFlex *ngIf="selectedSurvey">
+  <div class="survey-que">
+      <form novalidate [formGroup]="editSurveyForm" (ngSubmit)="onEditSurvey()">
+          <p>
+            <mat-form-field class="full-control">
+              <input matInput type="text" placeholder="Add Title" formControlName="title" name="title" required>
+              <mat-error *ngIf="editSurveyForm.get('title').hasError('required') && editSurveyForm.get('title').touched">
+                Please Enter the Title!!</mat-error>
+            </mat-form-field>
+          </p>
+          <button [disabled]="!editSurveyForm.valid" class="survey-btn">Edit Survey</button>
+      </form>
+  <mat-toolbar color="primary"> <span>Survey Questions</span> </mat-toolbar>
+  <table mat-table [dataSource]="questions" class="mat-elevation-z8">
+    <!-- name Column -->
+    <ng-container matColumnDef="questionText">
+      <th mat-header-cell *matHeaderCellDef> Emp Code </th>
+      <td mat-cell *matCellDef="let element"> {{element.questionText}} </td>
+    </ng-container>
+
+    <!-- Edit Column -->
+    <ng-container matColumnDef="Icons">
+      <th mat-header-cell *matHeaderCellDef> Icons </th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button color="primary" (click)="onEditQuestions(element._id)"><i
+            class="material-icons">edit</i></button>
+        <button mat-icon-button color="primary" (click)="onDeleteQuestions(element._id)"><i
+            class="material-icons">delete</i></button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  <button class="survey-btn" (click)="addQuestions()"> Add Question </button>
+</div>
+
+<div class="survey-ass">
+  <mat-toolbar color="primary"> <span>Survey Assignees</span> </mat-toolbar>
+  <table mat-table [dataSource]="assignees" class="mat-elevation-z8">
+    <ng-container matColumnDef="Emp Name">
+      <th mat-header-cell *matHeaderCellDef> Emp Name</th>
+      <td mat-cell *matCellDef="let element" > {{element.FirstName +' '+ element.LastName}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="RishabhId">
+        <th mat-header-cell *matHeaderCellDef> RishabhId </th>
+        <td mat-cell *matCellDef="let element" > {{element.RishabhId}}</td>
+      </ng-container>
+
+    <ng-container matColumnDef="Icons">
+          <th mat-header-cell *matHeaderCellDef> Icon</th>
+          <td mat-cell *matCellDef="let element">
+              <input type="checkbox" (change)="selectedValue(element, $event.target.checked)" [checked]="checkedUserList">
+          </td>
+        </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumnData"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumnData;"></tr>
+  </table>
+  <button  class="survey-btn" (click)="editAssignees()" >Add Assignees</button>
+  <button class="survey-btn" (click)="deleteAssignees()">Delete Assignees</button>
+</div>
+</div>
+
+

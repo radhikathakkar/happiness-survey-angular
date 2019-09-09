@@ -1,0 +1,166 @@
+import { Component, OnInit, Input, ViewChild, EventEmitter } from '@angular/core';
+import { SurveyService } from 'src/app/services/survey.service';
+import { MatDialog, MatTableDataSource } from '@angular/material';
+import { UserService } from '../services/user.service';
+import { Router } from '@angular/router';
+import { EditQuestionComponent } from './questions/edit-question/edit-question.component';
+import { QuestionService } from '../services/question.service';
+import { FormGroup, FormArray, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { AssigneesDataComponent } from './assignees-data/assignees-data.component';
+import { AddQuestionComponent } from './questions/add-question/add-question.component';
+
+
+@Component({
+  selector: 'app-survey-data',
+  templateUrl: './survey-data.component.html',
+  styleUrls: ['./survey-data.component.css']
+})
+
+export class SurveyDataComponent implements OnInit {
+
+  raRishabhId: string;
+  surveys: any;
+  selectedSurvey: any;
+  name: string;
+  findSurvey: any;
+  checkedUserList: any = [];
+  assigneesId: any = [];
+  assingeesList: any = [];
+  questions = new MatTableDataSource();
+  assignees: any = new MatTableDataSource();
+  displayedColumns: string[] = ['questionText', 'Icons'];
+  displayedColumnData: string[] = ['Emp Name', 'RishabhId', 'Icons'];
+  surveyUserArr: any = [];
+  allUserArr: any = [];
+  editSurveyForm: FormGroup;
+  userArray: any = [];
+  constructor(private surveyService: SurveyService, private userService: UserService, private fb: FormBuilder,
+              private dialog: MatDialog, private router: Router, private questionService: QuestionService) {
+  }
+
+  ngOnInit() {
+    this.name = localStorage.getItem('name');
+    this.raRishabhId = localStorage.getItem('rishabhId');
+    this.getAllUser();
+    this.getSurveyDataByID();
+  }
+
+  // To get Survey Details By Survey Id
+  getSurveyDataByID = () => {
+    this.surveyService.getSurveyByOwner(this.raRishabhId)
+      .subscribe(
+        (data: any) => {
+          this.surveys = data;
+        });
+  }
+
+  addQuestions = () => {
+    this.dialog.open(AddQuestionComponent, {
+      width: '550px', height: '340px',
+      data: this.selectedSurvey
+    });
+  }
+  editAssignees = () => {
+    this.getArrayValue();
+    this.dialog.open(AssigneesDataComponent, {
+      width: '740px', height: '470px',
+      data: {
+        surveyId: this.selectedSurvey,
+        user: this.userArray
+      }
+    });
+  }
+  selected(e) {
+    this.editSurveyForm = this.fb.group({
+      title: ['', Validators.required],
+    });
+    this.findSurvey = this.surveys.find(data => data._id === e);
+    this.questions = this.findSurvey.questions;
+    this.assingeesList = this.findSurvey.assignees;
+    this.assigneesId = this.assingeesList.map(arr => arr._id);
+    this.getData();
+  }
+
+  onEditQuestions(id) {
+    this.dialog.open(EditQuestionComponent,
+      {
+        data: {
+          id,
+          surveyId: this.selectedSurvey
+        },
+        width: '440px',
+        height: '170px',
+      });
+  }
+
+
+  onDeleteQuestions(id) {
+    this.questionService.deleteQue(this.selectedSurvey, id)
+      .subscribe(
+        (data) => {
+          window.alert('User deleted Successfully...');
+          window.location.reload();
+          this.router.navigate(['../navbar/question']);
+        },
+        (err) => console.log('error' + err));
+  }
+
+  selectedValue(value, event) {
+    const index = this.checkedUserList.indexOf(event);
+    if (event) {
+      this.checkedUserList.pop(value.RishabhId);
+    } else {
+      if (index !== -1) {
+        this.checkedUserList.splice(index, 1);
+      } else {
+        this.checkedUserList.push(value.RishabhId);
+      }
+    }
+    // console.log(this.checkedUserList);
+  }
+
+  public getData = () => {
+    this.surveyService.getUsername(this.assigneesId)
+      .subscribe((data) => {
+        this.assignees = data;
+        this.surveyUserArr = this.assignees.map(user => user.RishabhId);
+
+      });
+  }
+
+  getAllUser = () => {
+    this.userService.getUserData(this.name)
+      .subscribe((data) => {
+        this.allUserArr = data.recordset.map(user => user.RishabhId);
+      });
+  }
+
+  getArrayValue = () => {
+    let data;
+    this.userArray = [];
+    this.allUserArr.forEach(user => {
+      data = this.surveyUserArr.includes(user);
+      if (data === true) {
+        return data;
+      } else {
+        this.userArray.push(user);
+      }
+    });
+  }
+
+  onEditSurvey = () => {
+    this.surveyService.updateSurvey(this.selectedSurvey, this.editSurveyForm.value)
+    .subscribe((survey) => {
+      console.log('updates survey :', survey);
+    });
+  }
+
+  deleteAssignees = () => {
+    this.surveyService.updateAssigneesToSurvey(this.selectedSurvey, this.checkedUserList)
+    .subscribe((data) => {
+      return data;
+    });
+    window.location.reload();
+  }
+
+}

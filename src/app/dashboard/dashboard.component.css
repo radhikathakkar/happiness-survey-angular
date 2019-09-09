@@ -1,0 +1,21 @@
+.headerClass {
+    width: 400px;
+  
+    /* box-shadow: 0 4px 8px 0 rgba(204, 141, 141, 0.2), 0 6px 20px 0 rgba(122, 22, 22, 0.712);
+    text-align: center; */
+      box-align: center;
+      border: none;
+      display: inline-block;
+      padding: 8px 16px;
+      vertical-align: middle;
+      width: 100%;
+      overflow: hidden;
+      -webkit-text-fill-color: #ffeeee;
+      text-decoration: none;
+      color: inherit;
+      background-color: inherit;
+      background-image: linear-gradient(#3f51b5, rgb(99, 148, 238));
+      text-align: center;
+      cursor: pointer;
+      white-space: nowrap;
+  }

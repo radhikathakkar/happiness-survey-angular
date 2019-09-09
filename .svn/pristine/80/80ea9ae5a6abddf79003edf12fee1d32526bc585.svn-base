@@ -1,0 +1,36 @@
+import { Component, OnInit, Inject } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { QuestionService } from 'src/app/services/question.service';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+
+@Component({
+  selector: 'app-add-question',
+  templateUrl: './add-question.component.html',
+  styleUrls: ['./add-question.component.css']
+})
+export class AddQuestionComponent implements OnInit {
+
+  addQuestionForm: FormGroup;
+  surveyId: string;
+  constructor(private fb: FormBuilder, private questionService: QuestionService,
+              private dialogRef: MatDialogRef<AddQuestionComponent>, @Inject(MAT_DIALOG_DATA) data: any) {
+                this.surveyId = data;
+                this.addQuestion();
+  }
+  ngOnInit() { }
+  addQuestion() {
+    this.addQuestionForm = this.fb.group({
+      questionText: ['', Validators.required],
+    });
+  }
+  onSubmit() {
+    this.questionService.addQuestionsData(this.surveyId, this.addQuestionForm.value)
+      .subscribe(
+        (data) => {
+          window.alert('Data Added Successfully...');
+        }, (err)  => err
+      );
+    this.dialogRef.close();
+    window.location.reload();
+  }
+}

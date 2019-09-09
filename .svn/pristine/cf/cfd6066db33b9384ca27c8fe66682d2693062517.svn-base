@@ -1,0 +1,21 @@
+<h3 class="headerClass">{{title}}</h3> <br><br>
+<div class="container">
+  <mat-form-field>
+    <mat-label>Select Survey</mat-label>
+
+    <mat-select matNativeControl [(ngModel)]="selectValue" name="selectValue"
+      (ngModelChange)="onchange($event,selectValue)">
+      <option value="{{title}}" selected></option>
+      <mat-option *ngFor="let s of survey" [value]="s._id" selected>
+        {{s.title}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <div class="container">
+    <div class="col-sm-6">
+      <div width="500px" height="500px">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>

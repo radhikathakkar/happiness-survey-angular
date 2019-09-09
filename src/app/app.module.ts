@@ -1,0 +1,60 @@
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MaterialModule } from './material/material.module';
+import { AppRoutingModule } from './app-routing.module';
+import { HeroesComponent } from './heroes/heroes.component';
+import { AppComponent } from './app.component';
+import { LoginComponent } from './login/login.component';
+
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { SurveyComponent } from './dashboard/survey/survey.component';
+import { QuestionsComponent } from './survey-data/questions/questions.component';
+import { UserComponent } from './user/user.component';
+import { NavbarComponent } from './navbar/navbar.component';
+import { SurveyDataComponent } from './survey-data/survey-data.component';
+import { AddSurveyComponent } from './add-survey/add-survey.component';
+import { AssigneesComponent } from './add-survey/assignees/assignees.component';
+import { SurveyService } from './services/survey.service';
+import { UserService } from './services/user.service';
+
+import 'hammerjs';
+import { AssigneesDataComponent } from './survey-data/assignees-data/assignees-data.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HeroesComponent,
+    LoginComponent,
+    NavbarComponent,
+    DashboardComponent,
+    SurveyComponent,
+    SurveyDataComponent,
+    QuestionsComponent,
+    UserComponent,
+    AddSurveyComponent,
+    AssigneesComponent,
+    AssigneesDataComponent
+  ],
+  entryComponents: [
+    AssigneesDataComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    AppRoutingModule,
+    MaterialModule,
+    BrowserAnimationsModule,
+  ],
+  providers: [
+    SurveyService, UserService
+ ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }

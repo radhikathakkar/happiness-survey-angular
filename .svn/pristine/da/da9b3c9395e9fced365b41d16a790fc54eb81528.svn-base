@@ -1,0 +1,21 @@
+.add-survey-data{
+  width: 100%;
+  height: 100vh;
+  overflow-x: hidden;
+  padding: 50px;
+}
+
+.que-btn-list{
+  position: absolute;
+    right: 0px;
+    bottom: 1px;
+}
+
+.que-btn-list button{
+  background: none;
+  border: hidden;
+}
+
+.add-survey-btn{
+  width: 180px; height: 45px; background-color:#000; color: #fff; font-size: 16px; text-align: center;
+}

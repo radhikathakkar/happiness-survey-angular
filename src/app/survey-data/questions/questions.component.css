@@ -1,0 +1,24 @@
+table{
+  width: 100%;
+}
+
+.add-que-data{
+      /* position: absolute; */
+    /* right: 33%; */
+    margin-top: 20px;
+    margin-right: -10px;
+    background-color: transparent;
+    float: right;
+    padding: 0;
+}
+.add-que-data i{
+  font-size: 3.4em;
+}
+
+/* .container{
+  margin: 55px auto;
+} */
+
+.mat-dialog-container{
+  padding: 0;
+}

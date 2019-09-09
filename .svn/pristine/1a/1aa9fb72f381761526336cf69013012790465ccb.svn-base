@@ -1,0 +1,38 @@
+<h3 class="headerClass">{{titleName}}</h3> <br><br>
+<div class="container">
+<h4><i>{{message}}</i></h4>
+<mat-form-field>
+    <mat-label>Select Survey</mat-label>
+    <mat-select  matNativeControl [(ngModel)]="selectValue" name="person" (ngModelChange)="onSelect($event,selectValue)">
+        <option value="Select" selected></option>
+      <mat-option *ngFor="let sid of survey" [value]="sid._id">
+        {{sid.title}}
+      </mat-option>
+    </mat-select>
+    </mat-form-field>  
+<form #f="ngForm">
+
+      <br><br><br>
+
+    <div *ngFor="let q of question;index as i">
+      <p class="embose">{{q.questionText}}</p>
+      <!-- <mat-slider min="0" max="9" thumbLabel [displayWith]="formatLabel" [(ngModel)]="ans[i]"></mat-slider>
+      <mat-slider
+        class = "tp-margin"
+        [disabled] = "disabled"
+        [invert] = "invert"      
+        [thumbLabel] = "thumbLabel"     
+        [(ngModel)] = "ans[i]"
+        [vertical] = "vertical"></mat-slider> -->
+      <div class="slidecontainer">
+        <input type="range" min="0" max="10" id="myRange"  [(ngModel)]="points[i]" name="points[i]" required>
+        <p>Value: {{points[i]}}<span id="demo"></span></p>
+      </div>
+      
+    </div>
+    <input type="submit"(click)="onSubmit()">Click me to submit!
+    <p></p>
+   
+  </form>
+
+</div>

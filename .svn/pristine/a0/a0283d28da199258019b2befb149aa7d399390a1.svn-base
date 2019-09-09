@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+</head>
+
+<body>
+<mat-toolbar color="primary">Login</mat-toolbar>
+  <div class="container">
+    <div class="container" mat-dialog-content>
+      <div class="col">
+      
+      </div>
+      <div  class="col-6" class="example-card">
+        <form #userForm="ngForm" (ngSubmit)="onSubmit()" >
+          <div class="example-container">
+            <mat-form-field style="text-align: center">
+              <input matInput placeholder="E-Mail name"  style="text-align: center" required #username="ngModel"
+                [class.is-invalid]="username.invalid && username.touched" name="username" [(ngModel)]="userForms.username">
+              <small [class.d-none]="username.valid || username.untouched">Email is required</small>
+            </mat-form-field>
+            <br>
+            <mat-form-field style="text-align: center">
+              <input [type]="show ? 'text' : 'password'" matInput placeholder="Password" style="text-align: center" required #password="ngModel"
+                [class.is-invalid]="password.invalid && username.touched" name="password" [(ngModel)]="userForms.password">
+              <small [class.d-none]="password.valid || password.untouched">Password is required</small>
+            </mat-form-field>
+            <input type="checkbox"  (change)="isPassword()">
+            <br>
+            <br>
+            <button class="login-btn" [disabled]="userForm.form.invalid">Submit</button>
+          </div>
+        </form>
+
+      </div>
+      <div class="col">
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
