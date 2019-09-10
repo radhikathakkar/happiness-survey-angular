@@ -288,12 +288,12 @@ export class SurveyDataComponent implements OnInit {
   }
   onEditSurvey = () => {
     this.updateSurveyData();
-    console.log(this.editSurveyForm.value);
-    // this.surveyService.updateSurvey(this.selectedSurvey, this.editSurveyForm.value)
-    //   .subscribe((data) => {
-    //     window.location.reload();
-    //     return data;
-    //   });
+    // console.log(this.editSurveyForm.value);
+    this.surveyService.updateSurvey(this.selectedSurvey, this.editSurveyForm.value)
+      .subscribe((data) => {
+        window.location.reload();
+        return data;
+      });
   }
 
 }

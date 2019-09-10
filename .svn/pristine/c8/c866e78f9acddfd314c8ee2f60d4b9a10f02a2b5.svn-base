@@ -118,7 +118,7 @@ export class SurveyDataComponent implements OnInit {
       questionType: rowObj.questionType
     });
     // this.table.renderRows();
-   // this.changeDetectorRef.detectChanges();
+    this.changeDetectorRef.detectChanges();
     this.displayQuestion(this.questions);
   }
   // display questions without page reload
@@ -141,7 +141,60 @@ export class SurveyDataComponent implements OnInit {
     });
     return true;
   }
-  // to get all survey user
+  // delete checked assignees from database
+  deleteAssignees = (action) => {
+    if (action === 'Delete') {
+      let value;
+      let index;
+      for (const user of this.checkedUserList) {
+        this.surveyUserArr.forEach(surveyUser => {
+          value = this.checkedUserList.includes(surveyUser);
+          if (value === true) {
+            index = this.surveyUserArr.indexOf(user);
+            this.surveyUserArr.splice(index, 1);
+          }
+        });
+      }
+      if (this.checkedUserList.length >= this.assignees.length) {
+        // this.assignees = [];
+        this.deleteAllUser(this.checkedUserList);
+      } else {
+        this.displayAssigneesAfterDel(this.checkedUserList);
+      }
+    }
+  }
+
+  deleteAllUser = (user) => {
+    this.deleteUserList = [];
+    this.deleteUserList = user;
+    if (this.allSelected === true) {
+      this.assignees = [];
+    }
+    this.selection.clear();
+  }
+
+  // display assignees after delte
+  displayAssigneesAfterDel = (rowObj: any) => {
+    let selectedId;
+    rowObj.filter(ele => selectedId = ele);
+    this.assignees = this.assignees.filter((value, key) => {
+      if (value.RishabhId !== selectedId) {
+        return value.RishabhId !== selectedId;
+      } else {
+        this.deleteUserList = [];
+        this.deleteUserList = rowObj;
+      }
+    });
+    this.selection.clear();
+  }
+  deleteAllAssignees = () => {
+    this.isAllSelected() ?
+      this.assignees.forEach(row => {
+        this.selection.select(row);
+        this.assignees.splice(row._id, 1);
+      }) :
+      this.assignees = [];
+  }
   getArrayValue = () => {
     let data: boolean;
     this.allUserArr.forEach((user) => {
@@ -161,7 +214,6 @@ export class SurveyDataComponent implements OnInit {
       }
     });
   }
-  // to manage assignees dialog
   editAssignees = (action, obj) => {
     obj.action = action;
     this.getArrayValue();
@@ -189,7 +241,6 @@ export class SurveyDataComponent implements OnInit {
       this.allSelected = false;
     });
   }
-  // display assignees after add
   addAssignees = (rowObj: any) => {
     this.surveyService.getIdFromRishabhId(rowObj)
       .subscribe((users) => {
@@ -220,60 +271,6 @@ export class SurveyDataComponent implements OnInit {
     }
     return `${this.selection.isSelected(row) ? 'select' : 'deselect'} row ${row.position + 1}`;
   }
-  // delete checked assignees from database
-  deleteAssignees = (action) => {
-    if (action === 'Delete') {
-      let value;
-      let index;
-      for (const user of this.checkedUserList) {
-        this.surveyUserArr.forEach(surveyUser => {
-          value = this.checkedUserList.includes(surveyUser);
-          if (value === true) {
-            index = this.surveyUserArr.indexOf(user);
-            this.surveyUserArr.splice(index, 1);
-          }
-        });
-      }
-      if (this.checkedUserList.length >= this.assignees.length) {
-        this.deleteAllUser(this.checkedUserList);
-      } else {
-        this.displayAssigneesAfterDel(this.checkedUserList);
-      }
-    }
-  }
-  // display assignees after all delete
-  deleteAllUser = (user) => {
-    this.deleteUserList = [];
-    this.deleteUserList = user;
-    if (this.allSelected === true) {
-      this.assignees = [];
-    }
-    this.selection.clear();
-  }
-
-  // display assignees after delete checked user
-  displayAssigneesAfterDel = (rowObj: any) => {
-    let selectedId;
-    rowObj.filter(ele => selectedId = ele);
-    this.assignees = this.assignees.filter((value, key) => {
-      if (value.RishabhId !== selectedId) {
-        return value.RishabhId !== selectedId;
-      } else {
-        this.deleteUserList = [];
-        this.deleteUserList = rowObj;
-      }
-    });
-    this.selection.clear();
-  }
-  deleteAllAssignees = () => {
-    this.isAllSelected() ?
-      this.assignees.forEach(row => {
-        this.selection.select(row);
-        this.assignees.splice(row._id, 1);
-      }) :
-      this.assignees = [];
-  }
-
   updateSurveyData = () => {
     const title = this.editSurveyForm.controls.title.value;
     if (title === null) {
@@ -288,12 +285,12 @@ export class SurveyDataComponent implements OnInit {
   }
   onEditSurvey = () => {
     this.updateSurveyData();
-    console.log(this.editSurveyForm.value);
-    // this.surveyService.updateSurvey(this.selectedSurvey, this.editSurveyForm.value)
-    //   .subscribe((data) => {
-    //     window.location.reload();
-    //     return data;
-    //   });
+    // console.log(this.editSurveyForm.value);
+    this.surveyService.updateSurvey(this.selectedSurvey, this.editSurveyForm.value)
+      .subscribe((data) => {
+        window.location.reload();
+        return data;
+      });
   }
 
 }
