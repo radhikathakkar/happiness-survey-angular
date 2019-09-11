@@ -1,9 +1,9 @@
 
-import { Component, OnInit, ViewChild, ViewChildren, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { SurveyService } from 'src/app/services/survey.service';
-import { MatDialog, MatTableDataSource, MatTable } from '@angular/material';
+import { MatDialog, MatTableDataSource} from '@angular/material';
 import { UserService } from '../services/user.service';
-import { FormGroup, FormBuilder, Validators, NgModel, FormArray, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { AssigneesDataComponent } from './assignees-data/assignees-data.component';
 import { QuestionsComponent } from './questions/questions.component';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -56,7 +56,7 @@ export class SurveyDataComponent implements OnInit {
   // get all the user's from sql database
   getAllUser = () => {
     this.userService.getUserData(this.name)
-      .subscribe((data) => {
+      .subscribe((data: any)  => {
         this.allUserArr = data.recordset.map(user => user.RishabhId);
       });
   }
@@ -77,7 +77,7 @@ export class SurveyDataComponent implements OnInit {
   // get assignees dta under selected survey and rishabhId of assignees
   public getData = () => {
     this.surveyService.getUsername(this.assigneesId)
-      .subscribe((data) => {
+      .subscribe((data: any) => {
         this.assignees = data;
         this.surveyUserArr = this.assignees.map(user => user.RishabhId);
       });
@@ -90,8 +90,9 @@ export class SurveyDataComponent implements OnInit {
       });
   }
   // open dialog box to add, update and delete questions
-  openDialog = (action, obj) => {
+  openDialog = (action, obj, i) => {
     obj.action = action;
+    obj.index = i;
     const dialogRef = this.dialog.open(QuestionsComponent,
       {
         data: {
@@ -117,18 +118,12 @@ export class SurveyDataComponent implements OnInit {
       questionText: rowObj.questionText,
       questionType: rowObj.questionType
     });
-    // this.table.renderRows();
-   // this.changeDetectorRef.detectChanges();
-    this.displayQuestion(this.questions);
-  }
-  // display questions without page reload
-  displayQuestion = (obj) => {
-    this.questions = obj;
+    this.updateRowData(this.questions);
   }
   // update questions within selected survey
   updateRowData = (rowObj: any) => {
     this.questions = this.questions.filter((value, key) => {
-      if (value._id === rowObj._id) {
+      if (key === rowObj.index) {
         value.questionText = rowObj.questionText;
       }
       return true;
@@ -137,7 +132,7 @@ export class SurveyDataComponent implements OnInit {
   // delete questions within selected survey
   deleteRowData = (rowObj: any) => {
     this.questions = this.questions.filter((value, key) => {
-      return value.questionText !== rowObj.questionText;
+        return key !== rowObj.index;
     });
     return true;
   }
@@ -174,6 +169,7 @@ export class SurveyDataComponent implements OnInit {
       }
     });
     dialogRef.afterClosed().subscribe((result) => {
+      console.log('result = ', result);
       this.deleteUserList = [];
       this.userArray = [];
       this.checkedUserList = [];
@@ -192,7 +188,7 @@ export class SurveyDataComponent implements OnInit {
   // display assignees after add
   addAssignees = (rowObj: any) => {
     this.surveyService.getIdFromRishabhId(rowObj)
-      .subscribe((users) => {
+      .subscribe((users: any) => {
         this.assignees = users;
       });
   }
@@ -295,5 +291,4 @@ export class SurveyDataComponent implements OnInit {
     //     return data;
     //   });
   }
-
 }

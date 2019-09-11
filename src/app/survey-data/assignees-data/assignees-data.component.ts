@@ -10,7 +10,6 @@ import { SelectionModel } from '@angular/cdk/collections';
   styleUrls: ['./assignees-data.component.css']
 })
 export class AssigneesDataComponent implements OnInit {
-
   displayedColumns: string[] = ['EmpName', 'RishabhId', 'Designation', 'DivName', 'Icons'];
   dataSource: any = new MatTableDataSource();
   surveyId: string;
@@ -28,23 +27,27 @@ export class AssigneesDataComponent implements OnInit {
     this.action = this.localData.action;
     this.userArray = [];
     this.userArray = data.user;
+    console.log('userArray = ', this.userArray);
   }
   ngOnInit() {
     this.name = localStorage.getItem('name');
     this.getData();
   }
-
   public getData = () => {
-    this.surveyService.getAssignees(this.surveyId)
+    if (this.userArray.length !== 0) {
+      this.surveyService.getAssignees(this.surveyId)
       .subscribe((data) => {
         let arr: any = [];
         arr = data;
         if (arr.length === 0) {
-          this.getAllUser();
+            this.getAllUser();
         } else {
           this.getRemainUser();
         }
       });
+    } else {
+      this.dataSource = [];
+    }
   }
   getAllUser = () => {
     this.userService.getUserData(this.name)
@@ -53,6 +56,8 @@ export class AssigneesDataComponent implements OnInit {
       });
   }
   removeData = (obj) => {
+    console.log(obj);
+    console.log(this.dataSource);
     this.dataSource.map((user) => {
       obj.forEach(data => {
         let index;
