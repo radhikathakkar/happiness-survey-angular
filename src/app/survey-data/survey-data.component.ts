@@ -1,7 +1,7 @@
 
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { SurveyService } from 'src/app/services/survey.service';
-import { MatDialog, MatTableDataSource} from '@angular/material';
+import { MatDialog, MatTableDataSource } from '@angular/material';
 import { UserService } from '../services/user.service';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { AssigneesDataComponent } from './assignees-data/assignees-data.component';
@@ -17,6 +17,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 export class SurveyDataComponent implements OnInit {
   raRishabhId: string;
   surveys: any;
+  filterSurveys: any;
   selectedSurvey: any;
   surveyTitle: string;
   name: string;
@@ -34,6 +35,7 @@ export class SurveyDataComponent implements OnInit {
   userArray: any = [];
   deleteUserList: any = [];
   allSelected = false;
+  currentDate = new Date().toDateString();
   selection = new SelectionModel<any>(true, []);
   constructor(private surveyService: SurveyService, private userService: UserService, private fb: FormBuilder,
               private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) {
@@ -50,15 +52,32 @@ export class SurveyDataComponent implements OnInit {
     this.surveyService.getSurveyByOwner(this.raRishabhId)
       .subscribe(
         (data: any) => {
-          this.surveys = data;
+          this.filterSurveys = data;
+          this.displaySurvey(this.filterSurveys);
         });
   }
   // get all the user's from sql database
   getAllUser = () => {
     this.userService.getUserData(this.name)
-      .subscribe((data: any)  => {
+      .subscribe((data: any) => {
         this.allUserArr = data.recordset.map(user => user.RishabhId);
       });
+  }
+  displaySurvey = (surveys) => {
+    surveys.filter((survey) => {
+      const surveyId = survey._id;
+      if (survey.endDate !== '' || survey.endDate !== undefined) {
+        if (new Date(survey.endDate) < new Date(this.currentDate)) {
+          // this.surveyService.deleteSurvey(surveyId)
+          // .subscribe((data) => {
+          //   console.log('data on delete selected survey', data);
+          // });
+          const index = surveys.indexOf(survey);
+          surveys.splice(index, 1);
+        }
+        this.surveys = surveys;
+      }
+    });
   }
   // display result of selected survey by survey id
   selected = (e) => {
@@ -73,6 +92,7 @@ export class SurveyDataComponent implements OnInit {
     this.assingeesList = this.findSurvey.assignees;
     this.assigneesId = this.assingeesList.map(arr => arr._id);
     this.getData();
+
   }
   // get assignees dta under selected survey and rishabhId of assignees
   public getData = () => {
@@ -132,7 +152,7 @@ export class SurveyDataComponent implements OnInit {
   // delete questions within selected survey
   deleteRowData = (rowObj: any) => {
     this.questions = this.questions.filter((value, key) => {
-        return key !== rowObj.index;
+      return key !== rowObj.index;
     });
     return true;
   }
@@ -169,7 +189,6 @@ export class SurveyDataComponent implements OnInit {
       }
     });
     dialogRef.afterClosed().subscribe((result) => {
-      console.log('result = ', result);
       this.deleteUserList = [];
       this.userArray = [];
       this.checkedUserList = [];
@@ -284,11 +303,11 @@ export class SurveyDataComponent implements OnInit {
   }
   onEditSurvey = () => {
     this.updateSurveyData();
-    console.log(this.editSurveyForm.value);
-    // this.surveyService.updateSurvey(this.selectedSurvey, this.editSurveyForm.value)
-    //   .subscribe((data) => {
-    //     window.location.reload();
-    //     return data;
-    //   });
+    // console.log(this.editSurveyForm.value);
+    this.surveyService.updateSurvey(this.selectedSurvey, this.editSurveyForm.value)
+      .subscribe((data) => {
+        window.location.reload();
+        return data;
+      });
   }
 }

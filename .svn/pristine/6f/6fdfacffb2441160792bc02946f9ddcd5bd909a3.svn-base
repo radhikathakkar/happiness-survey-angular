@@ -115,6 +115,7 @@ export class AddSurveyComponent implements OnInit {
   onSubmit = () => {
     this.pushAssignees();
     this.addSurveyForm.controls.ownerID.setValue(this.raRishabhId);
+    console.log('this.addSurveyForm.value =', this.addSurveyForm.value);
     this.surveyService.postSurvey(this.addSurveyForm.value)
       .subscribe(data => data);
     this.addSurveyForm.reset();
