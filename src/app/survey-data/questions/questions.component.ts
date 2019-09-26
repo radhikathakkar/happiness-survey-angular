@@ -22,7 +22,6 @@ export class QuestionsComponent implements OnInit {
     this.action = this.localData.action;
     this.id = this.localData._id;
     this.createQuestionForm();
-    console.log(this.localData);
   }
   ngOnInit() { }
   public createQuestionForm = () => {
