@@ -1,21 +1,104 @@
 <h3 class="headerClass">{{title}}</h3> <br><br>
-<div class="container">
-  <mat-form-field>
-    <mat-label>Select Survey</mat-label>
 
-    <mat-select matNativeControl [(ngModel)]="selectValue" name="selectValue"
-      (ngModelChange)="onchange($event,selectValue)">
-      <option value="{{title}}" selected></option>
-      <mat-option *ngFor="let s of survey" [value]="s._id" selected>
-        {{s.title}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <div class="container">
+<mat-form-field>
+  <mat-label>Select Survey</mat-label>
+
+  <mat-select matNativeControl [(ngModel)]="selectValue" name="selectValue"
+    (ngModelChange)="onchange($event,selectValue)">
+    <option value="{{title}}" selected></option>
+    <mat-option *ngFor="let s of survey" [value]="s._id" selected>
+      {{s.title}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+<div class="container">
+
+  <div class="row">
     <div class="col-sm-6">
       <div width="500px" height="500px">
         <canvas id="myChart"></canvas>
+
       </div>
+
     </div>
+
   </div>
+
+  <div>
+
+  </div>
+
+  <div class="col-sm-6">
+
+    <button (click)="imageDownload('jpg',true)" class="btn btn-info">
+      <mat-icon>bar_chart</mat-icon>Save Chart As Image
+    </button>
+  </div>
+  <div class="col-sm-6">
+
+  </div>
+  <marquee direction="right"> <hr></marquee>
+
+  <!-- -------------- -->
+<mat-accordion>
+  <mat-expansion-panel (opened)="panelOpenState = true"  (closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+          Survey Not Yet Fill By User
+      </mat-panel-title>
+
+  </mat-expansion-panel-header>
+
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col"> Index </th>
+            <th scope="col">Name</th>
+            <th scope="col">RishabhId</th>
+
+          </tr>
+        </thead>
+        <tbody *ngFor="let user of blankUserNameId;let i = index ">
+          <tr>
+            <th scope="row">{{i+1}}</th>
+            <td>{{user.FirstName}} {{user.LastName}}</td>
+            <td>{{user.RishabhId}}</td>
+
+          </tr>
+        </tbody>
+      </table>
+      <button  class="btn btn-info" (click)="sendMail()" > Send E-Mail Reminders</button>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel (opened)="panelOpenState = true"  (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+            Survey Fill By User
+        </mat-panel-title>
+
+    </mat-expansion-panel-header>
+
+      <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col"> Index </th>
+              <th scope="col">Name</th>
+              <th scope="col">RishabhId</th>
+
+            </tr>
+          </thead>
+          <tbody >
+            <tr *ngFor="let user of FilledUserNameId;let i = index ">
+              <th scope="row">{{i}}</th>
+              <td>{{user.FirstName}} {{user.LastName}}</td>
+              <td>{{user.RishabhId}}</td>
+            </tr>
+          </tbody>
+        </table>
+    </mat-expansion-panel>
+
+
+  </mat-accordion>
+
 </div>

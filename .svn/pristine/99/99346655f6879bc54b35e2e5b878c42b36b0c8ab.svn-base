@@ -18,6 +18,7 @@ export class DashboardComponent implements OnInit {
 	surveyId: string;
 	title: any = [];
 	selectedSurvey: any = [];
+	// tslint:disable-next-line:ban-types
 	newArray: any = [];
 	noFoundBlankUser: string;
 	noFoundFilledUser: string;
@@ -46,11 +47,10 @@ export class DashboardComponent implements OnInit {
 		this.surveyId = localStorage.getItem('sid');
 		// tslint:disable-next-line:ban-types
 		const userName = localStorage.getItem('name');
-    console.log(userName);
+
 		this.surveyService.getUnderSurvey(userName)
 			.subscribe((result) => {
-        this.survey = result;
-
+				this.survey = result;
 				this.title = this.survey[0].title;
 				this.survey[0].assignees.forEach(e => {
 					if (e.response.length === 0) {
@@ -60,7 +60,9 @@ export class DashboardComponent implements OnInit {
 						this.SurveyFilledUsers.push(e._id);
 						console.log(this.SurveyFilledUsers);
 					}
+
 				});
+
 				const multiArray = this.survey[0].assignees.map(x => x.response.map(y => y.response));
 				this.gotArray(multiArray);
 				this.showChart()
@@ -68,6 +70,7 @@ export class DashboardComponent implements OnInit {
 	}
 
 	onchange = (e) => {
+
 		this.newArray = [];
 		this.blankFillUsers = [];
 		this.SurveyFilledUsers = [];
@@ -136,11 +139,11 @@ export class DashboardComponent implements OnInit {
 	imageDownload(type:string,fromRemote:boolean) {
 
 		this.image = this.ctx.toBlob( (blob, title) => {
-
+			
 		return saveAs(blob, `${this.title}.png`)
 
 		});
-
+	
 
 	}
 
@@ -201,3 +204,4 @@ export class DashboardComponent implements OnInit {
 	}
 
 }
+

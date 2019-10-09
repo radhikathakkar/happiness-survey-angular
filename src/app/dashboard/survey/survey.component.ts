@@ -17,9 +17,12 @@ export class SurveyComponent implements OnInit {
   surveyId: string;
   titleName: string;
   message: string;
+
   constructor(private surveyService: SurveyService, private loginService: LoginService) { }
+
   ngOnInit() {
     this.userId = localStorage.getItem('uid');
+
     this.surveyService.getUsersFilledSurvey(this.userId)
       .subscribe((result) => {
         this.survey = result;
@@ -30,6 +33,7 @@ export class SurveyComponent implements OnInit {
           this.titleName = this.survey[0].title;
           this.question = this.survey[0].questions;
         }
+
       });
     this.loginService.showList();
   }
