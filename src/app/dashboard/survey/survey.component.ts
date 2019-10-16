@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SurveyService } from 'src/app/services/survey.service';
 import { LoginService } from 'src/app/services/login.service';
+import { UserService } from 'src/app/services/user.service';
 
 
 @Component({
@@ -18,7 +19,7 @@ export class SurveyComponent implements OnInit {
   titleName: string;
   message: string;
 
-  constructor(private surveyService: SurveyService, private loginService: LoginService) { }
+  constructor(private surveyService: SurveyService, private loginService: LoginService, private userService: UserService) { }
 
   ngOnInit() {
     this.userId = localStorage.getItem('uid');
@@ -58,11 +59,17 @@ export class SurveyComponent implements OnInit {
         generatedObj.push(e);
       }
     });
-
-    this.surveyService.postSurveyResponse(this.surveyId, this.userId, generatedObj)
-      .subscribe((result) => {
-      });
-    location.reload();
+    const RishabhId = localStorage.getItem('user').split('.com')[0];
+    const RishabhMail = RishabhId + 'soft.com';
+    console.log(RishabhMail);
+    this.userService.sendMailOnSurveyFill(RishabhMail)
+    .subscribe((result) => {
+      console.log(result);
+    });
+    // this.surveyService.postSurveyResponse(this.surveyId, this.userId, generatedObj)
+    //   .subscribe((result) => {
+    //   });
+    // location.reload();
     return generatedObj;
 
   }

@@ -28,4 +28,7 @@ export class UserService {
   sendMailUser = (userId) => {
     return this.http.post(this.url + '/sql/send', {userId});
   }
+  sendMailOnSurveyFill = (userId) => {
+    return this.http.post(this.url + '/sql/sendOnSubmit', {userId});
+  }
 }

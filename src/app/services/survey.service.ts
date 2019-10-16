@@ -36,6 +36,7 @@ export class SurveyService {
   postSurveyResponse(sid: string, uid: string, e: any) {
     return this.http.put<any>(`${this.baseUrl}` + `/${sid}/response/` + `${uid}`, { response: e });
   }
+
   getSurveyResponse(sid: string, uid: string) {
     return this.http.get<any>(`${this.baseUrl}` + `/${sid}/response/` + `${uid}`);
   }
@@ -57,6 +58,10 @@ export class SurveyService {
   }
   getAssignees = (surveyId: string) => {
     return this.http.get(`${this.url}/${surveyId}/assignees`)
+    .pipe(res => res);
+  }
+  getUserByUserId = (userId: string) => {
+    return this.http.post(`${this.url}/userId`, {userId})
     .pipe(res => res);
   }
 
